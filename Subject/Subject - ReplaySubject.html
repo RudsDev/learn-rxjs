@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@reactivex/rxjs@6.3.3/dist/global/rxjs.umd.js"></script>
+    <title>RxJS - Subjects (Replay)</title>
+  </head>
+  <body>
+    <script>
+			const { ReplaySubject } = rxjs;
+
+			/*
+				1 - ReplaySubject
+				
+					- Armazena uma quantidade definida de valores emitidos, essa informação é
+						passada como parâmetro do seu construtor. Um subscribe, mesmo que criado após
+						uma eventual emissão de eventos realizada pelo replaySubject, terá acesso aos
+						X últimos valores emitidos, onde X é a quantidade definida de valores a serem
+						guardados em "memória" após a emissão.
+
+					- É possível definir um tempo, em milissegundos, no qual esses valores serão
+						guardados. 
+			*/
+
+			/* Exemplo 1.1 - Recuperando os 3 últimos valores já emitidos */
+
+				const replaySubject = new ReplaySubject(3, 3000);
+
+				/* Emissão de valores antes do subscribe */
+				replaySubject.next(1);
+				replaySubject.next(2);
+				replaySubject.next(3);
+				replaySubject.next(4);
+
+				const subscription_1 = replaySubject.subscribe({
+					next: n => console.log('REPLAY SUBJECT [A]: ', n),
+					error: e => console.log(e),
+					complete: () => console.log('REPLAY SUBJECT [A] COMPLETADO'),
+				})
+
+				replaySubject.next(5);
+				replaySubject.next(6);
+
+				const subscription_2 = replaySubject.subscribe({
+					next: n => console.log('REPLAY SUBJECT [B]: ', n),
+					error: e => console.log(e),
+					complete: () => console.log('REPLAY SUBJECT [B] COMPLETADO'),
+				})
+
+				/*
+					Executando o exemplo vimos que a subscription_1 tem acesso ao conjunto de valores
+					{2, 3, 4, 5, 6} que é composto pelos valores que emitidos antes de sua criação e
+					que, devido ao comportamento esperado de um ReplaySubject, foram guardados em
+					"memória" e também pelos valores emitidos após a sua criação.
+
+					Já a subscription_2 tem acesso ao conjunto de valores {4,5,6} que é composto pelos
+					valores que foram armazenados pelo ReplaySubject.
+
+					Em ambas subscriptions a quantidade de valores já emitidos que foram guardados em 
+					memória segue o valor passado no construtor do ReplaySubject (nesse caso '3').
+
+
+					No caso da subscription_3 nenhum valor será recebido por ela. Isso ocorre pois na
+					criação do ReplaySubject passamos um tempo de 3 segundos para armazenamento dos
+					valores. Passado esse tempo todos os valores armazenados serão apagados.
+				*/
+
+				setTimeout(() => {
+					const subscription_3 = replaySubject.subscribe({
+						next: n => console.log('REPLAY SUBJECT [C]: ', n),
+						error: e => console.log(e),
+						complete: () => console.log('REPLAY SUBJECT [C] COMPLETADO'),
+					})
+				}, 3500)
+
+    </script>
+  </body>
+</html>

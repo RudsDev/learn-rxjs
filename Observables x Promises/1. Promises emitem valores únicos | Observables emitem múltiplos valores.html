@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@reactivex/rxjs@6.3.3/dist/global/rxjs.umd.js"></script>
+    <title>RxJS - Observables x Promises [1]</title>
+  </head>
+  <body>
+    <script>
+
+        /* 
+                Observables, assim como as Promises, são encapsuladores de dados. Encapsula-se
+            um dado em um Observable para que se tenha acesso aos métodos que um Observable
+            fornece para manipulação desse dado encapsulado. 
+
+                // Promise encapsulando dado
+                Ex [1]: Promise.resolve(1).then(data => console.log("Promise: ", data))
+                Ex [2]: new Promise(resolve => resolve(1)).then(data => console.log("Promise: ", data))
+        
+                // Observable encapsulando dado
+                Ex [3]: Observable.create(observable => observable.next(1)).subscribe(data => console.log("Observable: ", data))
+
+
+                Apesar de Promises e Observables encapsularem dados há diferenças substanciais
+            no funcionamento de ambos.
+
+                1. Promises emitem valores únicos. | Observables emitem múltiplos valores
+
+        */
+
+        const { Observable } = rxjs;
+
+
+
+
+
+        /* ### 1. Promises emitem valores únicos. | Observables emitem múltiplos valores ### */
+        
+        /*    
+                Ao tentar emitir multiplos valores com uma Promise (invocar o resolver mais
+            de uma vez com valores diferentes) não veremos alteração nenhuma na saída. Isso
+            porque a promise já voi "resolvida" ma primeira chamada do resolver. Ou seja,
+            emitiu apenas um valor.
+        */
+
+        new Promise(resolve => {
+            resolve(1)
+            resolve(2)
+        }).then(data => console.log("Promise: ", data))
+
+        
+        /*
+                Nos Observables esse comportamento é diferente. A emissão de multiplos
+            valores é possível. O Observable do exemplo exibirá o resultado das 2 chamadas
+            ao método next. Ou seja, um observable pode emitir diversos valores, e aqueles
+            que estiverem escritos nesse observable "observarão" essas emissões. 
+        */
+
+        Observable.create(observable => {
+            observable.next(1)
+            observable.next(2)
+        }).subscribe(data => console.log("Observable: ", data))
+
+
+    </script>
+  </body>
+</html>

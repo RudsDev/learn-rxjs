@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@reactivex/rxjs@6.3.3/dist/global/rxjs.umd.js"></script>
+    <title>RxJS - Observables x Promises [3]</title>
+  </head>
+  <body>
+    <script>
+
+        /* 
+            A Promise por padrão tem seu estado compatilhado. Ela é Multicast. 
+            A callback que é passada como parâmetro para seu construtor será executada uma
+            única vez, e seu estado será compartilhado. 
+
+
+            O Observer por padrão não tem seu estado compartilhado. Ele é Unicast.
+            A callback que é passada como parâmetro para seu método create() será executada
+            uma vez para cada invocação do método subscribe, e seu estado será NÃO será 
+            compartilhado. Porém, é possível alterar esse comportamento através do operador
+            'share'. 
+        */
+
+        const { Observable } = rxjs;
+        const { share } = rxjs.operators;
+
+
+        /* ### 3. Promises: Multicast | Observables: UniCast/Multicast ### */
+        
+        /*    
+                No exemplo abaixo é possível ver que a Promise é inicializada somente uma
+            vez pois a mensagem 'Iniciando Promise' só é exibida uma única vez. Além disso,
+            é possível ver que apesar de uma chamda ao método 'then()' ser feita fora de um
+            'setTimeout' e outra chamada dentro de um 'setTimeout' após 2 segundos, ambas as
+            saídas são exibidas ao mesmo tempo.
+                Já no Observable a mensagem 'Iniciando Observable' é exibida duas vezes, o 
+            que indica que ele é inicializado duas vezes: a primeira na invocação do seu
+            método 'subscribe' que é feita fora de um 'setTimeout', e a segunda é após os 2
+            segundos definidos para o 'setTimeout' no qual a invocação do método 'subscribe'
+            esta inserida. A saída do observable também é exibida duas vezes seguindo o 
+            mesmo padrão: a primeira relativa a invocação do seu método 'subscribe' que é 
+            feita fora de um 'setTimeout' e a segunda após os 2 segundos definidos para o 
+            'setTimeout'.
+        */
+
+        const promise = new Promise(resolve => {
+            console.log('Iniciando Promise')
+            setTimeout(() => {
+                resolve(5 ** 5) //saída (3125)
+            }, 4000);
+        })
+
+        const observer = Observable.create(observable => {
+            console.log('Iniciando Observable')
+            setTimeout(() => {
+                observable.next(3 ** 3) //saída (27)
+            }, 4000);
+        })
+
+        const observerWithShare = Observable.create(observable => {
+            console.log('Iniciando Observable (SHARE)')
+            setTimeout(() => {
+                observable.next(2 ** 2) //saída (27)
+            }, 4000);
+        }).pipe(share())
+        
+
+        promise.then(data => console.log("Promise: [1]", data))
+        observer.subscribe(data => console.log("Observable: [1]", data))
+        observerWithShare.subscribe(data => console.log("Observable: [SHARE]", data))
+
+
+        setTimeout(() => {
+
+            /* 
+                    Essa segunda chamada não 'zera' o timeout de 4 segundos existente dentro
+                do resolver da promise. 
+                    Uma vez que o timeout de 4 segundos expirou (pois o timeout do resolver
+                já foi iniciado pela primeira chamada ao then() que foi feita fora do 
+                'setTimeout'), devido ao compartilhamento de estado inerente as promises essa 
+                "informação" esta disponível para essa segunda chamada, que não precisará 
+                mais aguardar esse timeout.  
+            */
+            promise.then(data => console.log("Promise: [2]", data))
+            
+            /*
+                    Já o Observable não tem estado compartilhado por padrão, por isso, nessa 
+                segunda chamada o timeout que envolve a chamada ao método next() é 'zerado',
+                na verdade, um novo estado é criado para essa segunda chamada ao método
+                'subscribe'. Como um novo estado foi criado, o timout não esta mais expirado.
+            */
+            observer.subscribe(data => console.log("Observable: [2]", data))
+
+
+            /*
+                    Aqui há um comportamento semelhante ao da Promise, de compartilhamento
+                de estado devido ao uso do operador 'share' que torna o comportamento do 
+                observable multicast.
+            */
+            observerWithShare.subscribe(data => console.log("Observable: [SHARE]", data))
+
+        }, 2000);
+            
+
+    </script>
+  </body>
+</html>

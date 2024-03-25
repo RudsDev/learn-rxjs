@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@reactivex/rxjs@6.3.3/dist/global/rxjs.umd.js"></script>
+    <title>RxJS - Subjects (Async)</title>
+  </head>
+  <body>
+    <script>
+			const { AsyncSubject } = rxjs;
+
+      /*
+				1 - AsyncSubject
+				
+					- O AsyncSubject guarda a última emissão ocorrida antes dele ser completado.
+			*/
+
+      const asyncSubject = new AsyncSubject();
+
+      asyncSubject.next(1);
+      asyncSubject.next(2);
+      asyncSubject.next(3);
+      asyncSubject.next(4);
+
+      const subscription_1 = asyncSubject.subscribe({
+        next: n => console.log('ASYNC SUBJECT [A]: ', n),
+        error: e => console.log(e),
+        complete: () => console.log('ASYNC SUBJECT [A] COMPLETADO'),
+      })
+
+      asyncSubject.next(5);
+      asyncSubject.next(6);
+
+        setTimeout(() => {
+					const subscription_2 = asyncSubject.subscribe({
+						next: n => console.log('ASYNC SUBJECT [B]: ', n),
+						error: e => console.log(e),
+						complete: () => console.log('ASYNC SUBJECT [B] COMPLETADO'),
+					})
+				}, 2000)
+
+      asyncSubject.complete()
+
+      /*
+      
+        Em ambas subscriptions o comportamento será o mesmo. Ainda que a subscription_2
+        esteja dentro de um settimeout, seu comportamento não diferente da subscription_1.
+        Em ambos os casos o último valor emitido antes do AsyncSubject ser completado é que
+        é recebido pelas subscriptions. 
+      
+      */
+
+    </script>
+  </body>
+</html>

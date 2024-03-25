@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@reactivex/rxjs@6.3.3/dist/global/rxjs.umd.js"></script>
+    <title>RxJS - Observables x Promises [4 ]</title>
+  </head>
+  <body>
+    <script>
+
+        /* 
+        		- Uma Promise por padrão, não pode ser cancelada (a menos que use alguma lib
+				como o BlueBird, por exemplo).
+           		- Um Observer pode ser cancelado.
+        */
+
+        const { Observable } = rxjs;
+
+		const observer = Observable.create(observable => {
+			let i = 0
+            const interval = setInterval(() => {
+				console.log('Executando... :', i)
+				observable.next(i++)
+			}, 1000);
+
+
+			/*
+					Sem esse retorno, a finalização do 'setInterval' não ocorrerá. Será feita
+				a desinscrição, todavia o 'setInterval' continuará sendo executando, gerando
+				assim um Memomy Leak.
+					Deve se tomar cuidado pois uma desinscrição não finalizará a execução de
+				um recurso do dado que foi encapsulado. Nesse exemplo, pode-se ver que não 
+				seria finalizada a execução do 'setInterval' só com uma chamada ao método
+				'unsubscribe'. Deve-se finalizar cada recurso da maneira mais adequada. 
+			*/
+			return () => clearInterval(interval)
+        })
+
+
+		const subscriber = observer.subscribe(data => console.log("Observable : ", data))
+
+
+		setTimeout(() => {
+			subscriber.unsubscribe()
+		}, 5000);
+            
+
+    </script>
+  </body>
+</html>

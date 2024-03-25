@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@reactivex/rxjs@6.3.3/dist/global/rxjs.umd.js"></script>
+    <title>RxJS - Observables x Promises [2]</title>
+  </head>
+  <body>
+    <script>
+
+        /* 
+                Outra diferença entre Promise e Observable são os seus comportamentos Eager
+             e Lazy, respectivamente.
+                Uma Promise é Eager pois basta que a mesma seja declarada para que ela já
+            seja inicializada. Mesmo não havendo nenhuma invocação do seu método 'then()'.
+                
+                O Observable se comporta de maneira diferente. Ele não é inicializado ao
+            ser declarado. Só o será quando houver ao menos uma inscrição nele.
+        */
+
+        const { Observable } = rxjs;
+
+
+        /* ### 2. Promises: Imediata (Eager) | Observables: Sob demanda (Lazy) ### */
+        
+        /*    
+                A Promise do exemplo exibirá no console "Iniciando Promise" mesmo que não 
+            haja chamada ao seu método 'then'. Seu comportamento é Eager, tem inicialização
+            imediata. 
+                IMPORTANTE: Ela foi de fato resolvida. Embora seu método 'then()' não tenha
+            sido invocado. Quando o for, a callback passada por parâmetro apenas consumirá
+            o que já foi manipulado pelo método 'resolve' 
+        */
+
+        new Promise(resolve => {
+            console.log('Iniciando Promise')
+            resolve(5 ** 5)
+        })
+        // .then(data => console.log("Promise: ", data))
+
+        
+        /*
+                O Observable não será iniciado logo na sua declaração. Nada será exibido no
+            console. Isso por de seu comportamento é Lazy, tem inicialização sob demanda.
+                Ele só será inicializado quando houver alguma inscrição nele (uma invocação
+            do seu método 'subscribe'). No exemplo abaixo apenas depois de 3 segundos ele 
+            será inicializado.
+        */
+
+        const observer = Observable.create(observable => {
+            console.log('Iniciando Observable')
+            observable.next(3 ** 1)
+            observable.next(3 ** 2)
+            observable.next(3 ** 3)
+        })
+        
+        setTimeout(() => {
+            observer.subscribe(data => console.log("Observable: ", data))
+        }, 3000);
+
+
+    </script>
+  </body>
+</html>

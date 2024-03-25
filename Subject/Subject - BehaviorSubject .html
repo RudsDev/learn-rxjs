@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@reactivex/rxjs@6.3.3/dist/global/rxjs.umd.js"></script>
+    <title>RxJS - Subjects (Behaviour)</title>
+  </head>
+  <body>
+    <script>
+			const { BehaviorSubject } = rxjs;
+
+			/*
+				1 - BehaviorSubjects
+				
+					- Inicia com um valor determinado
+					- Mantém o último valor. Esse valor será emitido a qualquer novo subscribe
+			*/
+
+			/* Exemplo 1.1 - Emissão de valores antes do subscribe */
+			
+
+				/* Iniciando com um valor determinado (0) */
+				// const behaviourSubject = new BehaviorSubject(0);
+			
+				/* Emissão de valores antes do subscribe */
+				// behaviourSubject.next(1);
+				// behaviourSubject.next(2);
+				// behaviourSubject.next(3);
+				// behaviourSubject.next(4);
+
+				/* 
+					Como foi criado após emissão de valores, esse subscribe terá acesso somente ao
+					último valor que foi emitido pelo subject (nesse caso '4') o BehaviorSubject 
+					guardou na "memória" somente o último valor emitido. 
+				*/
+				// const subscription = behaviourSubject.subscribe({
+				// 	next: n => console.log('BEHAVIOUR SUBJECT: ', n),
+				// 	error: e => console.log(e),
+				// 	complete: () => console.log('BEHAVIOUR SUBJECT COMPLETADO'),
+				// })
+
+
+				
+				/*
+					Exemplo 1.2 - Dois subscribes intercalados
+				
+					Nesse exemplo vemos que o a subscription_1 terá acesso aos valores {4, 5, 6}.
+					Esse conjunto de valores é composto pelo último valor armazenado pelo subject
+					antes da criação da subscription_1 e os valores emitidos após a sua criação.
+
+					Já a subscription_2, terá acesso somente aos valores {6} que é  último valor
+					emitido pelo behaviourSubject e que, como esperado, é guardado e erá emitido
+					a qualquer novo subscribe.
+				
+				*/
+				
+				// const behaviourSubject = new BehaviorSubject(0);
+			
+				/* Emissão antes da criação da subscribe_1 */
+				// behaviourSubject.next(1);
+				// behaviourSubject.next(2);
+				// behaviourSubject.next(3);
+				// behaviourSubject.next(4);
+
+				/* Criação subscription_1 */
+				// const subscription_1 = behaviourSubject.subscribe({
+				// 	next: n => console.log('BEHAVIOUR SUBJECT [A]: ', n),
+				// 	error: e => console.log(e),
+				// 	complete: () => console.log('BEHAVIOUR SUBJECT [A] COMPLETADO'),
+				// })
+
+				/* Emissão depois da criação da subscribe_1 e antes da criação da subscribe_2*/
+				// behaviourSubject.next(5);
+				// behaviourSubject.next(6);
+
+				/* Criação subscription_2 */
+				// const subscription_2 = behaviourSubject.subscribe({
+				// 	next: n => console.log('BEHAVIOUR SUBJECT [B]: ', n),
+				// 	error: e => console.log(e),
+				// 	complete: () => console.log('BEHAVIOUR SUBJECT [B] COMPLETADO'),
+				// })
+
+    </script>
+  </body>
+</html>

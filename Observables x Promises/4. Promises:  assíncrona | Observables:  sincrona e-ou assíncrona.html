@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@reactivex/rxjs@6.3.3/dist/global/rxjs.umd.js"></script>
+    <title>RxJS - Observables x Promises [4 ]</title>
+  </head>
+  <body>
+    <script>
+
+        /* 
+        		- A Promise sempre é assíncrona.
+           		- O Observer pode ser síncrono ou assíncrono.
+
+				No código a seguir é possível ver que, apesar de a Promise ser declarada e
+			invocada primeiro que o Observable, a saída do Observable é exibida antes da
+			saída da Promise. Isso acontece pois uma Promise é sempre assíncrona enquanto o
+			Observable pode ser assíncrono ou não dependendo do contexto. É possível ver que
+			um Observable pode ser assíncrono quando o Observable cujo resolver esta dentro
+			de um 'setTimeout' com um timeout de 2 segundos, ainda que executado antes da
+			Promise e do Observable síncrono (sem 'setTimeout') tem sua saída exibida por 
+			último no log.
+        */
+
+        const { Observable } = rxjs;
+
+		Observable.create(observable => {
+            setTimeout(() => {
+				observable.next(1)
+				observable.next(2)
+				observable.next(3)
+				observable.next(4)
+				observable.next(5)
+				observable.next(6)
+				observable.next(7)
+				observable.next(8)
+				observable.next(9)
+				observable.next(10)
+			}, 2000);
+        }).subscribe(data => console.log("Observable (ASSÍNCRONO): ", data))
+
+        new Promise(resolve => {
+            resolve(1)
+        }).then(data => console.log("Promise: ", data))
+
+        Observable.create(observable => {
+            observable.next(2)
+        }).subscribe(data => console.log("Observable (SÍNCRONO): ", data))
+            
+
+    </script>
+  </body>
+</html>
