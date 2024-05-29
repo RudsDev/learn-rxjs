@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@reactivex/rxjs@6.3.3/dist/global/rxjs.umd.js"></script>
+    <title>RxJS - Subscription</title>
+  </head>
+  <body>
+    <script>
+
+		/* 
+			# Subscription
+			
+        Subscription é a maneira de se inscrever em um Observable no caso do Rx, por meio do
+      método Observable.subscribe(). 
+      O método "subscribe" recebe três parâmetros, mais especificamente, três callbacks:
+        1. Callback de manipulação do valor emitido - (value:any) => console.log(value)
+        2. Callback de manipulação erro - (error:any) => console.log(error)
+        3. Callback de notificação de fluxo do observable completo - () => console.log('Done')
+      Esses três calbacks também podem ser passados por meio de u objeto literal:
+        {
+          next: (value) => console.log(value)
+          error: (err) => console.log(err)
+          complete: () => console.log('Done')
+        }
+
+
+      **OBS**: Quando um erro acontece o fluxo do Observable é interrompido. Valores não serão
+               mais emitidos. Além disso, o callback de fluxo do observable completo naõ será
+               disparado.
+
+      
+      ## Unsubscribe
+
+        É possível se desinscrever de um observable atravées do objeto retornado pelo método 
+      Observable.subscribe(). Para isso basta chamar o método "unsubscribe" desse objeto. Ao 
+      chamar esse método os callbacks de notificação de erro e de fluxo completo não serão 
+      disparados.
+      Ex: 
+        `const subscription = observable.subscribe()
+        setTimeout(() => subscription.unsubscribe(), 1000)`
+
+
+      ## Subscription bind
+        Também é possível encadear subscriptions através do método "add()". Ao chama-lo, 
+      passando como parâmetro uma outra subscription, as duas estarão diretamente ligadas.
+      Ex: `subscription_1.add(subscription_2)`
+        Agora, ao se incovar subscription_1.unsubscribe(), a subscription_2 também será
+      desinscrita (mesmo que subscription_2 não esteja inscrita no mesmo observer que
+      a subscription_1). Para desfazer essa ligação basta invocar o método "remove()" tendo
+      como parâmetro a subinscrição do qualse deseja desligar.
+      Ex: `subscription_1.remove(subscription_2)`
+
+
+		*/
+
+    const { Observable } = rxjs;
+
+    const observableComplete = Observable.create((observer) => {
+      console.log('Observer Initialize (complete)')
+      let i = 1
+      const interval = setInterval(() => observableComplete.next(i++), 1000);
+      setTimeout(() => observableComplete.complete(), 5000)
+      return () => clearInterval(interval)
+    })
+
+    const observableUnsubscribe = Observable.create((observer) => {
+      console.log('Observer Initialize (complete)')
+      let i = 1
+      const interval = setInterval(() => observableUnsubscribe.next(i++), 1000);
+      setTimeout(() => observableUnsubscribe.complete(), 5000)
+      return () => clearInterval(interval)
+    })
+
+    const observableError = Observable.create((observer) => {
+      console.log('Observer Initialize (error)')
+      let i = 1
+      const interval = setInterval(() => observableError.next(i++), 1000);
+      setTimeout(() => observableError.error(new Error('Ops!')), 5000)
+      return () => clearInterval(interval)
+    })
+
+    const subscriptioUnsubscribe = observableUnsubscribe.subscribe(
+      {
+        next: (value) => console.log(value),
+        error: (err) => console.log(err),
+        complete: () => console.log('Done')
+      }
+    )
+
+    setTimeout(() => {
+      console.log('Unsubscriber')
+      subscriptioUnsubscribe.unsubscribe()
+    }, 7000);
+
+    </script>
+  </body>
+</html>
